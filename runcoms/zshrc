@@ -1,13 +1,92 @@
-#
-# Executes commands at the start of an interactive session.
-#
-# Authors:
-#   Sorin Ionescu <sorin.ionescu@gmail.com>
-#
+# Customize to your needs...
+# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
+# Initialization code that may require console input (password prompts, [y/n]
+# confirmations, etc.) must go above this block; everything else may go below.
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
+# Moved up here so the icons can work properly
+POWERLEVEL9K_MODE='nerdfont-complete'
 
 # Source Prezto.
 if [[ -s "${ZDOTDIR:-$HOME}/.zprezto/init.zsh" ]]; then
   source "${ZDOTDIR:-$HOME}/.zprezto/init.zsh"
 fi
 
-# Customize to your needs...
+
+# stty stop ''
+# stty start ''
+# stty -ixon
+# stty -ixoff
+# No lag when toggling vi modes
+KEYTIMEOUT=1
+
+# https://news.ycombinator.com/item?id=7749061
+setopt autopushd
+# Autocomplete dotfiles/hidden files
+# setopt globdots
+# https://stackoverflow.com/questions/32057760/is-it-possible-to-not-share-history-between-panes-windows-in-tmux-with-zsh
+setopt noincappendhistory
+setopt nosharehistory
+
+alias ld="lsd -l"
+
+alias rmnd="rm -rf node_modules"
+alias refresh="echo '󰗨 Removing node_modules...' && rmnd && echo ' Done!' && echo '󰑮 Installing node_modules...' && npm install && echo '  Done!'"
+alias cat='bat'
+alias grd='gwd ..origin/"$(git rev-parse --abbrev-ref HEAD)"'
+
+echodone()
+{
+  echo ' Done!'
+  echo ''
+}
+
+clear_node_modules()
+{
+  echo '󰗨 Removing node_modules...'
+  rmnd
+  echodone
+}
+
+install_node_modules()
+{
+  echo '󰑮 Installing node_modules...'
+  npm install
+  echodone
+}
+
+npm_start()
+{
+  echo ' Starting FE...'
+  npm start
+  echodone
+}
+
+refe ()
+{
+  clear_node_modules && install_node_modules && npm_start
+}
+
+# mkdir + cd into it
+# https://unix.stackexchange.com/questions/125385/combined-mkdir-and-cd
+mkcd ()
+{
+	mkdir -p -- "$1" && cd -P -- "$1"
+}
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+[ -f ~/.config/lscolors/lscolors.sh ] && source ~/.config/lscolors/lscolors.sh
+[[ ! -f ~/.config/p10k/.p10k.zsh ]] || source ~/.config/p10k/.p10k.zsh
+
+if type brew &>/dev/null; then
+	FPATH=$(brew --prefix)/share/zsh-completions:$FPATH
+
+	autoload -Uz compinit
+	compinit
+fi
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
